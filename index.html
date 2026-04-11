@@ -268,6 +268,33 @@ input[type=file] { display: none; }
     </div>
   </div>
 
+  <!-- ④-b 写真確認・保存（fallbackモード専用） -->
+  <div class="screen" id="scr-preview">
+    <div class="top-bar">
+      <div class="top-bar-title">写真を確認する</div>
+    </div>
+    <div class="body">
+      <div class="patient-banner">
+        <div class="patient-name" id="preview-name"></div>
+        <div class="patient-id"   id="preview-id"></div>
+      </div>
+      <img id="preview-img"
+        style="width:100%;border-radius:12px;margin-bottom:16px;
+               max-height:360px;object-fit:contain;background:#1C1C1E">
+      <div class="save-hint" style="margin-bottom:16px">
+        「この写真を保存する」→ 共有シートで「ファイルに保存」を選んでください
+      </div>
+      <button class="btn-p green" onclick="doShareSave()">この写真を保存する</button>
+      <button class="btn-s"       onclick="goScan()">撮り直す</button>
+      <div class="cancel-box" id="preview-cancel" style="display:none">
+        ⚠️ キャンセルされました。もう一度「この写真を保存する」をタップしてください。
+      </div>
+      <div class="err-box" id="preview-err" style="display:none">
+        ⚠️ 保存に失敗しました。もう一度タップしてください。
+      </div>
+    </div>
+  </div>
+
   <!-- ⑤ 終了 -->
   <div class="screen" id="scr-end">
     <div class="center-area">
@@ -301,6 +328,7 @@ var gHistory     = [];  // [{id, name, count}]
 var gLastPatient = '';  // goEnd() した患者ID
 var gPendingFile = null;
 var gSaving      = false;
+var gPreviewUrl  = null;   // プレビュー画像のオブジェクトURL
 
 // ============================================================
 //  ユーティリティ
@@ -474,7 +502,76 @@ async function onPhoto(e) {
   e.target.value = '';
   if (!files.length || gSaving) return;
   gPendingFile = files[0];
-  await doSave();
+
+  if (gFallbackMode) {
+    // ── fallback（iPad）: プレビュー画面を表示 ──
+    // ユーザーが「保存する」ボタンをタップしてからshare()を呼ぶことで
+    // iOSのユーザージェスチャー制限を回避する
+    if (gPreviewUrl) { URL.revokeObjectURL(gPreviewUrl); }
+    gPreviewUrl = URL.createObjectURL(gPendingFile);
+    document.getElementById('preview-img').src         = gPreviewUrl;
+    document.getElementById('preview-name').textContent = gPatientName;
+    document.getElementById('preview-id').textContent   = '患者番号：' + pad5(gPatientId);
+    document.getElementById('preview-cancel').style.display = 'none';
+    document.getElementById('preview-err').style.display    = 'none';
+    show('scr-preview');
+  } else {
+    // ── FSモード（PC/Chrome）: 自動保存 ──
+    await doSave();
+  }
+}
+
+// ============================================================
+//  保存：プレビュー画面の「この写真を保存する」ボタンから呼ぶ
+//  ボタンの直接タップ → ユーザージェスチャー保持 → share()が確実に動く
+// ============================================================
+async function doShareSave() {
+  if (gSaving || !gPendingFile) return;
+  gSaving = true;
+  document.getElementById('preview-cancel').style.display = 'none';
+  document.getElementById('preview-err').style.display    = 'none';
+
+  try {
+    var prefix   = getPrefix(gPatientId, gPatientName);
+    var c        = (gFallbackCounts[gPatientId] || 0) + 1;
+    var ext      = getExt(gPendingFile);
+    var filename = prefix + '_' + getDate() + '_' + String(c).padStart(2, '0') + ext;
+    var renamed  = new File([gPendingFile], filename, { type: gPendingFile.type || 'image/jpeg' });
+
+    if (navigator.canShare && navigator.canShare({ files: [renamed] })) {
+      await navigator.share({ files: [renamed], title: prefix + ' ' + c + '枚目' });
+    } else {
+      // ダウンロードフォールバック
+      var url = URL.createObjectURL(renamed);
+      var a = document.createElement('a');
+      a.href = url; a.download = filename;
+      document.body.appendChild(a); a.click(); document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    // ── 保存成功 ──
+    gFallbackCounts[gPatientId] = c;
+    if (gPreviewUrl) { URL.revokeObjectURL(gPreviewUrl); gPreviewUrl = null; }
+    gPendingFile = null;
+    gPhotoCount++;
+    var ex = gHistory.find(function(h) { return h.id === gPatientId; });
+    if (ex) { ex.count++; }
+    else { gHistory.unshift({ id: gPatientId, name: gPatientName, count: 1 }); }
+    document.getElementById('choice-name').textContent  = gPatientName;
+    document.getElementById('choice-id').textContent    = '患者番号：' + pad5(gPatientId);
+    document.getElementById('choice-count').textContent = gPhotoCount;
+    show('scr-choice');
+
+  } catch(e) {
+    if (e.name === 'AbortError') {
+      document.getElementById('preview-cancel').style.display = 'block';
+    } else {
+      console.error('doShareSave error:', e);
+      document.getElementById('preview-err').style.display = 'block';
+    }
+  } finally {
+    gSaving = false;
+  }
 }
 
 async function retrySave() {
@@ -583,7 +680,7 @@ async function saveViaShare(file) {
 //  終了
 // ============================================================
 function confirmEnd() {
-  if (!confirm('作業を終了しますか？')) return;
+  if (!confirm('このカルテのスキャンは全部完了しましたか？\n\nOK → 作業を終了する\nキャンセル → 戻る')) return;
   goEnd();
 }
 
