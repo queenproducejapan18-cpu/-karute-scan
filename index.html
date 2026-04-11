@@ -30,12 +30,10 @@ body {
 .screen        { display: none; }
 .screen.active { display: block; }
 
-/* トップバー */
 .top-bar       { background: var(--bg2); border-bottom: 0.5px solid var(--bdr); padding: 16px 20px 14px; position: sticky; top: 0; z-index: 10; }
 .top-bar-title { font-size: 17px; font-weight: 600; }
 .top-bar-sub   { font-size: 12px; color: var(--text2); margin-top: 3px; }
 
-/* 中央レイアウト */
 .center-area {
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   padding: 64px 24px 32px; text-align: center; min-height: 70vh;
@@ -44,10 +42,8 @@ body {
 .center-title { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
 .center-sub   { font-size: 15px; color: var(--text2); line-height: 1.8; margin-bottom: 32px; }
 
-/* ボディ */
 .body { padding: 20px; }
 
-/* 入力 */
 .field-wrap  { margin-bottom: 18px; }
 .field-label { font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 6px; }
 .big-input {
@@ -59,7 +55,6 @@ body {
 .big-input:focus { border-color: var(--blue); box-shadow: 0 0 0 3px rgba(0,122,255,0.15); }
 .hint { font-size: 12px; color: var(--text3); margin-top: 5px; }
 
-/* ボタン */
 .btn-p {
   width: 100%; padding: 17px; font-size: 17px; font-weight: 700;
   border-radius: 14px; border: none; background: var(--blue);
@@ -84,12 +79,10 @@ body {
 }
 .btn-d:active { background: #FFF0EF; }
 
-/* 患者バナー */
 .patient-banner { background: #EBF3FF; border-radius: 14px; padding: 14px 16px; margin-bottom: 20px; }
 .patient-name   { font-size: 18px; font-weight: 600; color: #005CC8; }
 .patient-id     { font-size: 13px; color: #0066CC; margin-top: 3px; }
 
-/* カメラエリア */
 .camera-area {
   background: var(--bg2); border-radius: 14px; border: 2px dashed var(--bdr);
   min-height: 220px; display: flex; flex-direction: column;
@@ -103,15 +96,12 @@ body {
 .cam-sub   { font-size: 13px; color: var(--text2); }
 input[type=file] { display: none; }
 
-/* カウント */
 .photo-count { text-align: center; font-size: 15px; color: var(--text2); margin-bottom: 20px; }
 .photo-count strong { font-size: 28px; font-weight: 700; color: var(--text); }
 
-/* メッセージボックス */
 .info-bar {
   background: #EBF3FF; border-radius: 10px; padding: 11px 14px;
   font-size: 13px; color: #004499; margin-bottom: 16px; line-height: 1.6;
-  border: 0.5px solid rgba(0,122,255,.2);
 }
 .warn-box {
   background: #FFFBE6; border-radius: 10px; padding: 10px 14px;
@@ -128,15 +118,17 @@ input[type=file] { display: none; }
   font-size: 14px; color: #7A5000; margin-bottom: 16px;
   line-height: 1.7; border: 0.5px solid #F0C040;
 }
-
-/* 書き出しガイド（初回のみ） */
+.success-bar {
+  background: #F1FFF5; border-radius: 10px; padding: 11px 14px;
+  font-size: 14px; color: #1A6B38; margin-bottom: 16px; line-height: 1.6;
+  border: 0.5px solid #34C759;
+}
 .export-guide {
   background: #F1FFF5; border-radius: 10px; padding: 12px 14px;
   font-size: 13px; color: #1A6B38; margin-bottom: 16px;
   line-height: 1.9; border: 0.5px solid #34C759;
 }
 
-/* iPadワークフロー説明 */
 .step-box {
   background: var(--bg2); border-radius: 12px; padding: 14px 16px;
   margin-bottom: 20px; border: 0.5px solid var(--bdr); text-align: left;
@@ -146,26 +138,23 @@ input[type=file] { display: none; }
 
 .divider { height: 0.5px; background: var(--bdr); margin: 20px 0; }
 
-/* 終了情報 */
 .info-box { background: var(--bg2); border-radius: 12px; padding: 14px 16px; text-align: left; margin-bottom: 16px; border: 0.5px solid var(--bdr); width: 100%; }
 .info-row { font-size: 14px; color: var(--text2); line-height: 2.2; display: flex; justify-content: space-between; align-items: center; }
 .info-row strong { color: var(--text); font-weight: 600; }
 
-/* チェックリスト */
 .checklist { width: 100%; margin-bottom: 20px; }
 .check-item {
   display: flex; align-items: center; gap: 14px;
   background: var(--bg2); border-radius: 12px;
   padding: 16px; margin-bottom: 10px;
   border: 1.5px solid var(--bdr); cursor: pointer;
-  transition: border-color .15s;
 }
 .check-item.checked { border-color: var(--green); background: #F1FFF5; }
 .check-box {
   flex-shrink: 0; width: 26px; height: 26px;
   border-radius: 50%; border: 2px solid var(--bdr);
   background: var(--bg); display: flex; align-items: center; justify-content: center;
-  font-size: 15px; transition: all .15s;
+  font-size: 15px;
 }
 .check-item.checked .check-box { background: var(--green); border-color: var(--green); color: #fff; }
 .check-text { font-size: 15px; font-weight: 500; color: var(--text); line-height: 1.5; }
@@ -188,23 +177,22 @@ input[type=file] { display: none; }
     </div>
   </div>
 
-  <!-- ①-b 初回セットアップ（OPFSモード・初回のみ） -->
+  <!-- ①-b 初回セットアップ（初回のみ） -->
   <div class="screen" id="scr-setup">
     <div class="top-bar">
       <div class="top-bar-title">初回セットアップ</div>
       <div class="top-bar-sub">最初の1回だけ必要です</div>
     </div>
     <div class="body">
-      <div class="step-box" style="margin-bottom:20px">
+      <div class="step-box">
         <div class="step-title">📁 「カルテスキャン」フォルダの作成手順</div>
         <div class="step-item">① iPadの「ファイル」アプリを開く</div>
         <div class="step-item">②「このiPad内」をタップ</div>
         <div class="step-item">③ 右上「…」→「新規フォルダ」</div>
         <div class="step-item">④「カルテスキャン」と入力して完了</div>
       </div>
-
       <div class="checklist">
-        <div class="check-item" id="chk-folder" onclick="toggleCheck('chk-folder','chk-folder-done')">
+        <div class="check-item" id="chk-folder" onclick="toggleCheck('chk-folder')">
           <div class="check-box" id="chk-folder-box"></div>
           <div>
             <div class="check-text">「カルテスキャン」フォルダを作成した</div>
@@ -212,7 +200,6 @@ input[type=file] { display: none; }
           </div>
         </div>
       </div>
-
       <button class="btn-p" id="btn-setup-done" disabled onclick="finishSetup()">
         セットアップ完了・はじめる
       </button>
@@ -226,15 +213,6 @@ input[type=file] { display: none; }
       <div class="top-bar-sub" id="start-folder-sub"></div>
     </div>
     <div class="body">
-      <!-- 初回セットアップ案内（share modeのみ） -->
-      <div class="step-box" id="ipad-guide" style="display:none">
-        <div class="step-title">📱 写真の保存方法</div>
-        <div class="step-item">① カメラで撮影 →「この写真を使用」</div>
-        <div class="step-item">② アプリ内でプレビュー確認</div>
-        <div class="step-item">③「保存する」→ 共有シートが開く</div>
-        <div class="step-item">④「ファイルに保存」→「カルテスキャン」フォルダ</div>
-      </div>
-
       <div class="field-wrap">
         <div class="field-label">患者番号（数字のみ）</div>
         <input class="big-input" type="tel" id="inp-id"
@@ -245,13 +223,15 @@ input[type=file] { display: none; }
         <div class="field-label">患者名（カタカナ）</div>
         <input class="big-input" type="text" id="inp-name"
           placeholder="例：ヤマダ タロウ"
-          oninput="onInputChange()" oncompositionend="onInputChange()" autocomplete="off">
-        <div class="hint">カタカナで入力してください</div>
+          oninput="onNameInput()"
+          oncompositionstart="gComposing=true"
+          oncompositionend="onNameCompose()" autocomplete="off">
+        <div class="hint" id="name-hint">カタカナで入力してください</div>
       </div>
       <div class="warn-box" id="start-warn" style="display:none"></div>
       <button class="btn-p" id="btn-start" disabled onclick="startNewPatient()">撮影をはじめる</button>
       <div class="divider"></div>
-      <button class="btn-d" onclick="goEnd()">作業を終了する</button>
+      <button class="btn-d" onclick="confirmEnd()">作業を終了する</button>
     </div>
   </div>
 
@@ -265,69 +245,32 @@ input[type=file] { display: none; }
         <div class="patient-name" id="scan-name"></div>
         <div class="patient-id"   id="scan-id"></div>
       </div>
-
-      <div class="info-bar" id="scan-mode-bar" style="display:none"></div>
+      <div class="info-bar">
+        📂 写真はiPad内に自動保存されます
+      </div>
       <div class="photo-count">これまで <strong id="scan-count">0</strong> 枚撮影済み</div>
-
       <label for="file-input">
         <div class="camera-area" id="camera-area">
           <div class="cam-emoji" id="cam-emoji">📷</div>
           <div class="cam-label" id="cam-label">タップして撮影</div>
-          <div class="cam-sub"   id="cam-sub">1枚ずつ自動保存されます</div>
+          <div class="cam-sub"   id="cam-sub">撮影後すぐに保存されます</div>
         </div>
       </label>
       <input type="file" id="file-input"
         accept="image/*" capture="environment"
         onchange="onPhoto(event)">
-
       <div class="err-box" id="scan-err" style="display:none">
         ⚠️ 保存に失敗しました。
         <div style="margin-top:8px">
-          <button class="btn-p" style="margin:0" onclick="retryFromScan()">もう一度保存する</button>
+          <button class="btn-p" style="margin:0" onclick="retrySave()">もう一度保存する</button>
         </div>
       </div>
-
       <div class="divider"></div>
       <button class="btn-d" onclick="confirmEnd()">作業を終了する</button>
     </div>
   </div>
 
-  <!-- ④-b 写真確認（share modeのみ） -->
-  <div class="screen" id="scr-preview">
-    <div class="top-bar">
-      <div class="top-bar-title">写真を確認する</div>
-    </div>
-    <div class="body">
-      <div class="patient-banner">
-        <div class="patient-name" id="preview-name"></div>
-        <div class="patient-id"   id="preview-id"></div>
-      </div>
-      <img id="preview-img"
-        style="width:100%;border-radius:12px;margin-bottom:16px;
-               max-height:360px;object-fit:contain;background:#1C1C1E">
-      <div id="preview-first-guide" style="display:none">
-        <div class="export-guide">
-          📁 <strong>初回のみ</strong>：共有シートで<br>
-          「ファイルに保存」→「このiPad内」→<br>
-          「新規フォルダ」→「カルテスキャン」を作成して保存<br>
-          <span style="font-size:12px;opacity:.8">2回目以降は自動的に同じフォルダが選ばれます</span>
-        </div>
-      </div>
-      <div class="info-bar" style="margin-bottom:16px">
-        共有シートが開いたら「<strong>ファイルに保存</strong>」→「カルテスキャン」を選んでください
-      </div>
-      <button class="btn-p green" onclick="doShareSave()">この写真を保存する</button>
-      <button class="btn-s"       onclick="goScan()">撮り直す</button>
-      <div class="cancel-box" id="preview-cancel" style="display:none">
-        ⚠️ キャンセルされました。もう一度「この写真を保存する」をタップしてください。
-      </div>
-      <div class="err-box" id="preview-err" style="display:none">
-        ⚠️ 保存に失敗しました。もう一度タップしてください。
-      </div>
-    </div>
-  </div>
-
-  <!-- ⑤ 保存完了・選択 -->
+  <!-- ④ 保存完了・選択 -->
   <div class="screen" id="scr-choice">
     <div class="top-bar">
       <div class="top-bar-title">保存しました ✓</div>
@@ -339,39 +282,34 @@ input[type=file] { display: none; }
       </div>
       <div class="photo-count"><strong id="choice-count">0</strong> 枚目を保存</div>
       <button class="btn-p green" onclick="goScan()">同じ患者を続けて撮影</button>
-      <!-- OPFSモード：次の患者へ押すと自動で書き出し -->
-      <button class="btn-s" id="btn-next-patient" onclick="exportThenNext()">次の患者へ</button>
-      <!-- 非OPFSモード -->
-      <button class="btn-s" id="btn-next-patient-plain" onclick="goStart()" style="display:none">次の患者へ</button>
+      <button class="btn-s"       onclick="exportThenNext()">次の患者へ（書き出し）</button>
+      <div class="cancel-box" id="choice-cancel" style="display:none">
+        ⚠️ 書き出しがキャンセルされました。<br>
+        データはiPad内に保存済みです。終了画面からまとめて書き出せます。
+      </div>
       <div class="divider"></div>
       <button class="btn-d" onclick="confirmEnd()">作業を終了する</button>
     </div>
   </div>
 
-  <!-- ⑥ 終了 -->
+  <!-- ⑤ 終了 -->
   <div class="screen" id="scr-end">
     <div class="center-area" style="min-height:auto;padding-top:40px">
       <div class="big-emoji">🏁</div>
       <div class="center-title">お疲れさまでした</div>
       <div class="center-sub" id="end-sub" style="margin-bottom:16px"></div>
       <div class="info-box" id="end-info"></div>
-
-      <!-- OPFSモードのみ：全件書き出しボタン -->
       <div id="end-export-area" style="display:none;width:100%;margin-bottom:12px">
-        <div id="end-first-guide" style="display:none">
-          <div class="export-guide" style="text-align:left;margin-bottom:12px">
-            📁 <strong>初回のみの手順</strong><br>
-            共有シートで「ファイルに保存」をタップ<br>
-            →「このiPad内」→「新規フォルダ」<br>
-            →「<strong>カルテスキャン</strong>」と入力して保存<br>
-            <span style="font-size:12px;opacity:.8">✅ 2回目以降はiOSが同じフォルダを記憶します</span>
-          </div>
+        <div class="export-guide" id="end-first-guide" style="display:none">
+          📁 <strong>初回のみ</strong>：共有シートで<br>
+          「ファイルに保存」→「このiPad内」<br>
+          →「カルテスキャン」を選んで保存<br>
+          <span style="font-size:12px;opacity:.8">✅ 2回目以降はiOSが同じフォルダを記憶します</span>
         </div>
         <button class="btn-p teal" onclick="exportAll()">
           📤 未書き出しデータをまとめて書き出す
         </button>
       </div>
-
       <div style="width:100%">
         <button class="btn-p" onclick="goStart()">作業を再開する</button>
       </div>
@@ -386,12 +324,9 @@ input[type=file] { display: none; }
 // ============================================================
 //  状態
 // ============================================================
-var gDB           = null;
-var gRootDir      = null;
-var gFallbackMode = false;
-var gUseOPFS      = false;   // OPFS自動保存モード
-var gFallbackCounts = {};
-
+var gPhotoDB     = null;   // IndexedDB（写真保存用）
+var gRootDir     = null;   // File System Access API（PC用）
+var gMode        = 'share'; // 'fs' | 'idb'
 var gPatientId   = '';
 var gPatientName = '';
 var gPhotoCount  = 0;
@@ -399,8 +334,6 @@ var gHistory     = [];
 var gLastPatient = '';
 var gPendingFile = null;
 var gSaving      = false;
-var gPreviewUrl  = null;
-var gFirstExport = true;     // 初回書き出し案内フラグ
 
 // ============================================================
 //  ユーティリティ
@@ -410,7 +343,7 @@ function show(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
 }
-function pad5(n)   { return String(n).padStart(5, '0'); }
+function pad5(n) { return String(n).padStart(5, '0'); }
 function getDate() {
   var d = new Date();
   return d.getFullYear() + ('0'+(d.getMonth()+1)).slice(-2) + ('0'+d.getDate()).slice(-2);
@@ -425,9 +358,106 @@ function getExt(file) {
 }
 
 // ============================================================
-//  IndexedDB（FSモード用）
+//  IndexedDB（写真データ保存）
 // ============================================================
-function openDB() {
+function openPhotoDB() {
+  return new Promise(function(res, rej) {
+    var r = indexedDB.open('karute_photos_v1', 1);
+    r.onupgradeneeded = function(e) {
+      var db = e.target.result;
+      if (!db.objectStoreNames.contains('photos')) {
+        var store = db.createObjectStore('photos', { keyPath: 'id', autoIncrement: true });
+        store.createIndex('patientId', 'patientId', { unique: false });
+        store.createIndex('exported',  'exported',  { unique: false });
+      }
+    };
+    r.onsuccess = function(e) { res(e.target.result); };
+    r.onerror   = function()  { rej(new Error('PhotoDB open failed')); };
+  });
+}
+
+function dbCountByPatient(patientId) {
+  return new Promise(function(res) {
+    var tx  = gPhotoDB.transaction('photos', 'readonly');
+    var idx = tx.objectStore('photos').index('patientId');
+    var req = idx.count(IDBKeyRange.only(patientId));
+    req.onsuccess = function(e) { res(e.target.result || 0); };
+    req.onerror   = function()  { res(0); };
+  });
+}
+
+async function savePhotoToDB(file) {
+  var count    = await dbCountByPatient(gPatientId);
+  var ext      = getExt(file);
+  var prefix   = getPrefix(gPatientId, gPatientName);
+  var filename = prefix + '_' + getDate() + '_' + String(count + 1).padStart(2, '0') + ext;
+  var buf      = await file.arrayBuffer();
+
+  return new Promise(function(res, rej) {
+    var tx = gPhotoDB.transaction('photos', 'readwrite');
+    tx.objectStore('photos').add({
+      patientId:   gPatientId,
+      patientName: gPatientName,
+      filename:    filename,
+      type:        file.type || 'image/jpeg',
+      data:        buf,
+      date:        getDate(),
+      exported:    0
+    });
+    tx.oncomplete = function() { res(true); };
+    tx.onerror    = function(e) { rej(e); };
+  });
+}
+
+function getPhotosByPatient(patientId) {
+  return new Promise(function(res) {
+    var tx  = gPhotoDB.transaction('photos', 'readonly');
+    var idx = tx.objectStore('photos').index('patientId');
+    var req = idx.getAll(IDBKeyRange.only(patientId));
+    req.onsuccess = function(e) {
+      var records = e.target.result || [];
+      res(records.map(function(r) {
+        return { file: new File([r.data], r.filename, { type: r.type }), id: r.id };
+      }));
+    };
+    req.onerror = function() { res([]); };
+  });
+}
+
+function getUnexportedPhotos() {
+  return new Promise(function(res) {
+    var tx  = gPhotoDB.transaction('photos', 'readonly');
+    var idx = tx.objectStore('photos').index('exported');
+    var req = idx.getAll(IDBKeyRange.only(0));
+    req.onsuccess = function(e) {
+      var records = e.target.result || [];
+      res(records.map(function(r) {
+        return { file: new File([r.data], r.filename, { type: r.type }), id: r.id };
+      }));
+    };
+    req.onerror = function() { res([]); };
+  });
+}
+
+function markExported(ids) {
+  return new Promise(function(res) {
+    var tx    = gPhotoDB.transaction('photos', 'readwrite');
+    var store = tx.objectStore('photos');
+    ids.forEach(function(id) {
+      var req = store.get(id);
+      req.onsuccess = function(e) {
+        var record = e.target.result;
+        if (record) { record.exported = 1; store.put(record); }
+      };
+    });
+    tx.oncomplete = res;
+  });
+}
+
+// ============================================================
+//  File System Access API（PC / Chrome用）
+// ============================================================
+function openFSDB() {
   return new Promise(function(res, rej) {
     var r = indexedDB.open('karute_scan_v4', 1);
     r.onupgradeneeded = function(e) { e.target.result.createObjectStore('store'); };
@@ -435,75 +465,45 @@ function openDB() {
     r.onerror   = function()  { rej(new Error('DB open failed')); };
   });
 }
-function dbGet(key) {
+function fsdbGet(db, key) {
   return new Promise(function(res) {
-    var r = gDB.transaction('store','readonly').objectStore('store').get(key);
+    var r = db.transaction('store','readonly').objectStore('store').get(key);
     r.onsuccess = function(e) { res(e.target.result || null); };
     r.onerror   = function()  { res(null); };
   });
 }
-function dbPut(key, val) {
+function fsdbPut(db, key, val) {
   return new Promise(function(res, rej) {
-    var tx = gDB.transaction('store','readwrite');
+    var tx = db.transaction('store','readwrite');
     tx.objectStore('store').put(val, key);
     tx.oncomplete = res;
     tx.onerror    = rej;
   });
 }
 
-// ============================================================
-//  OPFS（ブラウザ内部ストレージ）
-// ============================================================
-async function initOPFS() {
+async function saveToFS(file) {
   try {
-    var root = await navigator.storage.getDirectory();
-    await root.getDirectoryHandle('カルテスキャン', { create: true });
+    var prefix     = getPrefix(gPatientId, gPatientName);
+    var patientDir = await gRootDir.getDirectoryHandle(prefix, { create: true });
+    var count = 0;
+    for await (var entry of patientDir.values()) {
+      if (entry.kind === 'file') count++;
+    }
+    var ext      = getExt(file);
+    var filename = prefix + '_' + getDate() + '_' + String(count + 1).padStart(2, '0') + ext;
+    var fh = await patientDir.getFileHandle(filename, { create: true });
+    var wr = await fh.createWritable();
+    await wr.write(file);
+    await wr.close();
     return true;
   } catch(e) {
-    console.warn('OPFS unavailable:', e);
+    console.error('saveToFS error:', e);
     return false;
   }
 }
 
-async function saveToOPFS(file) {
-  var root      = await navigator.storage.getDirectory();
-  var karteDir  = await root.getDirectoryHandle('カルテスキャン');
-  var prefix    = getPrefix(gPatientId, gPatientName);
-  var patientDir = await karteDir.getDirectoryHandle(prefix, { create: true });
-
-  // 既存ファイル数を数えて連番を決定
-  var count = 0;
-  for await (var entry of patientDir.values()) {
-    if (entry.kind === 'file') count++;
-  }
-  var ext      = getExt(file);
-  var filename = prefix + '_' + getDate() + '_' + String(count + 1).padStart(2, '0') + ext;
-
-  var fh = await patientDir.getFileHandle(filename, { create: true });
-  var wr = await fh.createWritable();
-  await wr.write(file);
-  await wr.close();
-  return true;
-}
-
-async function getPatientFiles(id, name) {
-  try {
-    var root       = await navigator.storage.getDirectory();
-    var karteDir   = await root.getDirectoryHandle('カルテスキャン');
-    var prefix     = getPrefix(id, name);
-    var patientDir = await karteDir.getDirectoryHandle(prefix);
-    var files = [];
-    for await (var entry of patientDir.values()) {
-      if (entry.kind === 'file') files.push(await entry.getFile());
-    }
-    return files;
-  } catch(e) {
-    return [];
-  }
-}
-
 // ============================================================
-//  起動ボタン
+//  起動
 // ============================================================
 async function onInitTap() {
   var btn = document.getElementById('btn-init');
@@ -511,51 +511,44 @@ async function onInitTap() {
   document.getElementById('init-err').style.display = 'none';
   document.getElementById('init-sub').textContent   = '準備中...';
 
-  // ── iPad / OPFS対応ブラウザ ──
+  // iPad / iOS Safari → IndexedDB モード
   if (!window.showDirectoryPicker) {
-    gFallbackMode = true;
-
-    if (navigator.storage && navigator.storage.getDirectory) {
-      var ok = await initOPFS();
-      if (ok) {
-        gUseOPFS = true;
-        gFirstExport = localStorage.getItem('opfsExportDone') !== '1';
-        document.getElementById('start-folder-sub').textContent =
-          '✅ 自動保存モード';
-        document.getElementById('ipad-guide').style.display = 'none';
-        // 初回のみセットアップ画面へ
-        if (localStorage.getItem('setupDone') !== '1') {
-          show('scr-setup');
-          return;
-        }
+    try {
+      gPhotoDB = await openPhotoDB();
+      gMode    = 'idb';
+      document.getElementById('start-folder-sub').textContent = '✅ 自動保存モード';
+      // 初回のみセットアップ画面
+      if (localStorage.getItem('setupDone') !== '1') {
+        show('scr-setup');
       } else {
-        document.getElementById('start-folder-sub').textContent = '写真は共有シートで保存します';
-        document.getElementById('ipad-guide').style.display = 'block';
+        show('scr-start');
       }
-    } else {
-      document.getElementById('start-folder-sub').textContent = '写真は共有シートで保存します';
-      document.getElementById('ipad-guide').style.display = 'block';
+    } catch(e) {
+      document.getElementById('init-err').textContent   = 'ストレージの初期化に失敗しました。Safariで開いているか確認してください。';
+      document.getElementById('init-err').style.display = 'block';
+      document.getElementById('init-sub').textContent   = 'タップして準備をはじめます';
+      btn.disabled = false;
     }
-    show('scr-start');
     return;
   }
 
-  // ── PC / File System Access API ──
+  // PC / Chrome → File System Access API モード
   try {
-    gDB = await openDB();
-    var handle = await dbGet('rootDir');
+    var db     = await openFSDB();
+    var handle = await fsdbGet(db, 'rootDir');
     if (!handle) {
       handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-      await dbPut('rootDir', handle);
+      await fsdbPut(db, 'rootDir', handle);
     } else {
       var perm = await handle.queryPermission({ mode: 'readwrite' });
       if (perm !== 'granted') perm = await handle.requestPermission({ mode: 'readwrite' });
       if (perm !== 'granted') {
         handle = await window.showDirectoryPicker({ mode: 'readwrite' });
-        await dbPut('rootDir', handle);
+        await fsdbPut(db, 'rootDir', handle);
       }
     }
     gRootDir = handle;
+    gMode    = 'fs';
     document.getElementById('start-folder-sub').textContent = '📁 ' + gRootDir.name;
     show('scr-start');
   } catch(e) {
@@ -569,19 +562,14 @@ async function onInitTap() {
 }
 
 // ============================================================
-//  初回セットアップ
+//  セットアップ
 // ============================================================
-var gChecks = {};
-
-function toggleCheck(itemId, doneKey) {
-  var item = document.getElementById(itemId);
-  var box  = item.querySelector('.check-box');
+function toggleCheck(itemId) {
+  var item    = document.getElementById(itemId);
+  var box     = item.querySelector('.check-box');
   var checked = item.classList.toggle('checked');
   box.textContent = checked ? '✓' : '';
-  gChecks[doneKey] = checked;
-  // 全チェック済みなら完了ボタンを有効化
-  var allDone = gChecks['chk-folder-done'] === true;
-  document.getElementById('btn-setup-done').disabled = !allDone;
+  document.getElementById('btn-setup-done').disabled = !checked;
 }
 
 function finishSetup() {
@@ -592,12 +580,58 @@ function finishSetup() {
 // ============================================================
 //  患者入力
 // ============================================================
+// カタカナ判定（全角カタカナ・長音符・中点のみ許可）
+function isKatakana(str) {
+  return /^[ァ-ヶーヴ\u30FB\s　]+$/.test(str);
+}
+
+var gComposing = false; // IME入力中フラグ
+
 function onInputChange() {
+  // 患者番号：数字以外を除去
   var idEl = document.getElementById('inp-id');
-  var id   = idEl.value.replace(/[^0-9]/g, '');
-  idEl.value = id;
-  var name = document.getElementById('inp-name').value.trim();
-  document.getElementById('btn-start').disabled = !(id.length > 0 && name.length > 0);
+  idEl.value = idEl.value.replace(/[^0-9]/g, '');
+  validateForm();
+}
+
+function onNameInput() {
+  if (!gComposing) validateName();
+  validateForm();
+}
+
+function onNameCompose() {
+  // IME確定後にバリデーション
+  gComposing = false;
+  validateName();
+  validateForm();
+}
+
+function validateName() {
+  var nameEl  = document.getElementById('inp-name');
+  var hintEl  = document.getElementById('name-hint');
+  var val     = nameEl.value;
+  if (val.length === 0) {
+    hintEl.textContent = 'カタカナで入力してください';
+    hintEl.style.color = 'var(--text3)';
+    return;
+  }
+  // スペース除いて判定
+  var noSpace = val.replace(/[\s　]/g, '');
+  if (noSpace.length > 0 && !isKatakana(val)) {
+    hintEl.textContent = '⚠️ カタカナ以外の文字が含まれています';
+    hintEl.style.color = 'var(--red)';
+  } else {
+    hintEl.textContent = '✓ OK';
+    hintEl.style.color = 'var(--green)';
+  }
+}
+
+function validateForm() {
+  var id      = document.getElementById('inp-id').value;
+  var nameVal = document.getElementById('inp-name').value.trim();
+  var nameOk  = nameVal.length > 0 && isKatakana(nameVal);
+  document.getElementById('btn-start').disabled = !(id.length > 0 && nameOk);
+
   var warn = document.getElementById('start-warn');
   if (id.length > 0 && id === gLastPatient) {
     warn.innerHTML     = '⚠️ この患者は直前の作業で終了済みです。<br>追加で撮影する場合はそのまま進めてください。';
@@ -608,8 +642,8 @@ function onInputChange() {
 }
 
 function goStart() {
-  document.getElementById('inp-id').value   = '';
-  document.getElementById('inp-name').value = '';
+  document.getElementById('inp-id').value             = '';
+  document.getElementById('inp-name').value           = '';
   document.getElementById('btn-start').disabled       = true;
   document.getElementById('start-warn').style.display = 'none';
   show('scr-start');
@@ -623,7 +657,7 @@ function startNewPatient() {
 }
 
 // ============================================================
-//  撮影画面
+//  撮影
 // ============================================================
 function goScan() {
   document.getElementById('scan-name').textContent  = gPatientName;
@@ -631,19 +665,6 @@ function goScan() {
   document.getElementById('scan-count').textContent = gPhotoCount;
   document.getElementById('scan-err').style.display = 'none';
   document.getElementById('file-input').value       = '';
-
-  // モード案内バー
-  var bar = document.getElementById('scan-mode-bar');
-  if (gUseOPFS) {
-    bar.textContent    = '📂 撮影した写真は自動でOPFSに保存されます';
-    bar.style.display  = 'block';
-  } else if (gFallbackMode) {
-    bar.textContent    = '💾 撮影後に保存確認画面が表示されます';
-    bar.style.display  = 'block';
-  } else {
-    bar.style.display  = 'none';
-  }
-
   setCamIdle();
   show('scr-scan');
 }
@@ -652,7 +673,7 @@ function setCamIdle() {
   document.getElementById('camera-area').classList.remove('busy');
   document.getElementById('cam-emoji').textContent = '📷';
   document.getElementById('cam-label').textContent = 'タップして撮影';
-  document.getElementById('cam-sub').textContent   = '1枚ずつ自動保存されます';
+  document.getElementById('cam-sub').textContent   = '撮影後すぐに保存されます';
 }
 function setCamBusy() {
   document.getElementById('camera-area').classList.add('busy');
@@ -662,88 +683,30 @@ function setCamBusy() {
 }
 
 // ============================================================
-//  写真取り込み
+//  写真取り込み → 自動保存（ユーザー操作不要）
 // ============================================================
 async function onPhoto(e) {
   var files = Array.from(e.target.files);
   e.target.value = '';
   if (!files.length || gSaving) return;
   gPendingFile = files[0];
-
-  if (gFallbackMode && !gUseOPFS) {
-    // Share mode: プレビュー画面へ
-    if (gPreviewUrl) URL.revokeObjectURL(gPreviewUrl);
-    gPreviewUrl = URL.createObjectURL(gPendingFile);
-    document.getElementById('preview-img').src          = gPreviewUrl;
-    document.getElementById('preview-name').textContent  = gPatientName;
-    document.getElementById('preview-id').textContent    = '患者番号：' + pad5(gPatientId);
-    document.getElementById('preview-cancel').style.display = 'none';
-    document.getElementById('preview-err').style.display    = 'none';
-    // 初回案内
-    var isFirst = localStorage.getItem('shareSaveDone') !== '1';
-    document.getElementById('preview-first-guide').style.display = isFirst ? 'block' : 'none';
-    show('scr-preview');
-  } else {
-    // OPFS mode or FS mode: 自動保存
-    await doSave();
-  }
+  await doSave();
 }
 
-// ============================================================
-//  プレビュー画面「この写真を保存する」（ユーザージェスチャーから直接呼ぶ）
-// ============================================================
-async function doShareSave() {
-  if (gSaving || !gPendingFile) return;
-  gSaving = true;
-  document.getElementById('preview-cancel').style.display = 'none';
-  document.getElementById('preview-err').style.display    = 'none';
-
-  try {
-    var prefix   = getPrefix(gPatientId, gPatientName);
-    var c        = (gFallbackCounts[gPatientId] || 0) + 1;
-    var ext      = getExt(gPendingFile);
-    var filename = prefix + '_' + getDate() + '_' + String(c).padStart(2, '0') + ext;
-    var renamed  = new File([gPendingFile], filename, { type: gPendingFile.type || 'image/jpeg' });
-
-    if (navigator.canShare && navigator.canShare({ files: [renamed] })) {
-      await navigator.share({ files: [renamed], title: prefix + ' ' + c + '枚目' });
-    } else {
-      var url = URL.createObjectURL(renamed);
-      var a = document.createElement('a');
-      a.href = url; a.download = filename;
-      document.body.appendChild(a); a.click(); document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }
-
-    // 成功
-    localStorage.setItem('shareSaveDone', '1');
-    gFallbackCounts[gPatientId] = c;
-    if (gPreviewUrl) { URL.revokeObjectURL(gPreviewUrl); gPreviewUrl = null; }
-    onSaveSuccess();
-
-  } catch(e) {
-    if (e.name === 'AbortError') {
-      document.getElementById('preview-cancel').style.display = 'block';
-    } else {
-      console.error('doShareSave error:', e);
-      document.getElementById('preview-err').style.display = 'block';
-    }
-  } finally {
-    gSaving = false;
-  }
+async function retrySave() {
+  if (!gPendingFile || gSaving) return;
+  document.getElementById('scan-err').style.display = 'none';
+  await doSave();
 }
 
-// ============================================================
-//  自動保存（OPFS / FSモード）
-// ============================================================
 async function doSave() {
   gSaving = true;
   setCamBusy();
   var result = false;
   try {
-    if (gFallbackMode && gUseOPFS) {
-      result = await saveToOPFS(gPendingFile);
-    } else if (!gFallbackMode) {
+    if (gMode === 'idb') {
+      result = await savePhotoToDB(gPendingFile);
+    } else if (gMode === 'fs') {
       result = await saveToFS(gPendingFile);
     }
   } catch(e) {
@@ -755,116 +718,63 @@ async function doSave() {
 
   if (result === true) {
     gPendingFile = null;
-    onSaveSuccess();
+    gPhotoCount++;
+    var ex = gHistory.find(function(h) { return h.id === gPatientId; });
+    if (ex) { ex.count++; }
+    else { gHistory.unshift({ id: gPatientId, name: gPatientName, count: 1 }); }
+    document.getElementById('choice-name').textContent    = gPatientName;
+    document.getElementById('choice-id').textContent      = '患者番号：' + pad5(gPatientId);
+    document.getElementById('choice-count').textContent   = gPhotoCount;
+    document.getElementById('choice-cancel').style.display = 'none';
+    show('scr-choice');
   } else {
     document.getElementById('scan-err').style.display = 'block';
   }
 }
 
-// 保存成功後の共通処理
-function onSaveSuccess() {
-  gPhotoCount++;
-  var ex = gHistory.find(function(h) { return h.id === gPatientId; });
-  if (ex) { ex.count++; }
-  else { gHistory.unshift({ id: gPatientId, name: gPatientName, count: 1 }); }
-
-  document.getElementById('choice-name').textContent  = gPatientName;
-  document.getElementById('choice-id').textContent    = '患者番号：' + pad5(gPatientId);
-  document.getElementById('choice-count').textContent = gPhotoCount;
-
-  // OPFSモードのみ「次の患者へ」を自動書き出し付きに切り替え
-  document.getElementById('btn-next-patient').style.display       = gUseOPFS ? 'block' : 'none';
-  document.getElementById('btn-next-patient-plain').style.display = gUseOPFS ? 'none'  : 'block';
-  show('scr-choice');
-}
-
-// 「次の患者へ」→ 現在の患者を書き出してから次へ（ユーザージェスチャーから呼ぶ）
+// ============================================================
+//  書き出し（ユーザージェスチャーから呼ぶ）
+// ============================================================
 async function exportThenNext() {
-  var files = await getPatientFiles(gPatientId, gPatientName);
-  if (!files.length) { goStart(); return; }
+  if (gMode !== 'idb') { goStart(); return; }
+  var items = await getPhotosByPatient(gPatientId);
+  if (!items.length) { goStart(); return; }
+  var files = items.map(function(i) { return i.file; });
+  var ids   = items.map(function(i) { return i.id; });
   try {
     if (navigator.canShare && navigator.canShare({ files: files })) {
-      await navigator.share({
-        files: files,
-        title: getPrefix(gPatientId, gPatientName) + '　' + files.length + '枚'
-      });
-      localStorage.setItem('opfsExportDone', '1');
-      gFirstExport = false;
+      await navigator.share({ files: files, title: getPrefix(gPatientId, gPatientName) });
+      await markExported(ids);
+      localStorage.setItem('exportDone', '1');
     }
   } catch(e) {
-    // キャンセルや失敗でもデータはOPFSに残っているので次へ進む
-    if (e.name !== 'AbortError') console.error('exportThenNext error:', e);
+    if (e.name === 'AbortError') {
+      document.getElementById('choice-cancel').style.display = 'block';
+    } else {
+      console.error('exportThenNext error:', e);
+    }
   }
   goStart();
 }
 
-async function retryFromScan() {
-  if (!gPendingFile || gSaving) return;
-  document.getElementById('scan-err').style.display = 'none';
-  await doSave();
-}
-
-// ============================================================
-//  保存：File System Access API（PC / Chrome）
-// ============================================================
-async function saveToFS(file) {
-  try {
-    var prefix     = getPrefix(gPatientId, gPatientName);
-    var patientDir = await gRootDir.getDirectoryHandle(prefix, { create: true });
-    var count = 0;
-    for await (var entry of patientDir.values()) {
-      if (entry.kind === 'file') count++;
-    }
-    var ext        = getExt(file);
-    var filename   = prefix + '_' + getDate() + '_' + String(count + 1).padStart(2, '0') + ext;
-    var fileHandle = await patientDir.getFileHandle(filename, { create: true });
-    var writable   = await fileHandle.createWritable();
-    await writable.write(file);
-    await writable.close();
-    return true;
-  } catch(e) {
-    console.error('saveToFS error:', e);
-    return false;
-  }
-}
-
-// ============================================================
-//  書き出し：OPFSからファイルアプリへ（ユーザージェスチャーから呼ぶ）
-// ============================================================
-async function exportCurrentPatient() {
-  await exportPatientById(gPatientId, gPatientName);
-}
-
-async function exportPatientById(id, name) {
-  var files = await getPatientFiles(id, name);
-  if (!files.length) { alert('書き出すファイルがありません'); return; }
+async function exportAll() {
+  if (gMode !== 'idb') return;
+  var items = await getUnexportedPhotos();
+  if (!items.length) { alert('未書き出しのデータはありません'); return; }
+  var files = items.map(function(i) { return i.file; });
+  var ids   = items.map(function(i) { return i.id; });
   try {
     if (navigator.canShare && navigator.canShare({ files: files })) {
-      await navigator.share({ files: files, title: getPrefix(id, name) });
-      localStorage.setItem('opfsExportDone', '1');
-      gFirstExport = false;
-    }
-  } catch(e) {
-    if (e.name !== 'AbortError') alert('書き出しに失敗しました');
-  }
-}
-
-async function exportAll() {
-  var allFiles = [];
-  for (var h of gHistory) {
-    var files = await getPatientFiles(h.id, h.name);
-    allFiles = allFiles.concat(files);
-  }
-  if (!allFiles.length) { alert('書き出すファイルがありません'); return; }
-  try {
-    if (navigator.canShare && navigator.canShare({ files: allFiles })) {
-      await navigator.share({ files: allFiles, title: '今日のカルテスキャン' });
-      localStorage.setItem('opfsExportDone', '1');
-      gFirstExport = false;
+      await navigator.share({ files: files, title: '今日のカルテスキャン' });
+      await markExported(ids);
+      localStorage.setItem('exportDone', '1');
       document.getElementById('end-first-guide').style.display = 'none';
+      alert('書き出しが完了しました');
     }
   } catch(e) {
-    if (e.name !== 'AbortError') alert('書き出しに失敗しました');
+    if (e.name !== 'AbortError') {
+      alert('書き出しに失敗しました。もう一度タップしてください。');
+    }
   }
 }
 
@@ -883,27 +793,25 @@ function goEnd() {
     gHistory.length > 0
       ? '本日 ' + gHistory.length + '人、合計 ' + total + '枚'
       : '本日の撮影はありませんでした。';
-
   document.getElementById('end-info').innerHTML = gHistory.length > 0
     ? gHistory.map(function(h) {
         return '<div class="info-row"><strong>' + pad5(h.id) + '　' + h.name + '</strong><span>' + h.count + '枚</span></div>';
       }).join('')
     : '<div class="info-row" style="color:var(--text3)">記録なし</div>';
 
-  // OPFSモードの書き出しエリア
   var exportArea = document.getElementById('end-export-area');
-  if (gUseOPFS && gHistory.length > 0) {
+  if (gMode === 'idb' && gHistory.length > 0) {
     exportArea.style.display = 'block';
-    document.getElementById('end-first-guide').style.display = gFirstExport ? 'block' : 'none';
+    var firstExport = localStorage.getItem('exportDone') !== '1';
+    document.getElementById('end-first-guide').style.display = firstExport ? 'block' : 'none';
   } else {
     exportArea.style.display = 'none';
   }
-
   show('scr-end');
 }
 
 // ============================================================
-//  Service Worker（オフラインキャッシュ）
+//  Service Worker
 // ============================================================
 if ('serviceWorker' in navigator) {
   window.addEventListener('load', function() {
