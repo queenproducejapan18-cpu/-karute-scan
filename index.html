@@ -123,6 +123,15 @@ input[type=file] { display: none; }
   line-height: 1.7; border: 0.5px solid #F0C040;
 }
 
+/* 共有シート案内バー */
+.save-hint {
+  background: #007AFF; color: #fff;
+  border-radius: 10px; padding: 11px 14px;
+  font-size: 14px; font-weight: 600;
+  margin-bottom: 16px; text-align: center;
+  line-height: 1.6;
+}
+
 /* iPadワークフロー説明 */
 .step-box {
   background: var(--bg2); border-radius: 12px; padding: 14px 16px;
@@ -201,6 +210,11 @@ input[type=file] { display: none; }
         <div class="patient-name" id="scan-name"></div>
         <div class="patient-id"   id="scan-id"></div>
       </div>
+      <!-- ② 共有シート案内（fallbackモード時のみ表示） -->
+      <div class="save-hint" id="save-hint" style="display:none">
+        撮影後の画面で「ファイルに保存」を選んでください
+      </div>
+
       <div class="photo-count">これまで <strong id="scan-count">0</strong> 枚撮影済み</div>
 
       <label for="file-input">
@@ -248,7 +262,7 @@ input[type=file] { display: none; }
       </div>
       <div class="photo-count"><strong id="choice-count">0</strong> 枚目を保存</div>
       <button class="btn-p green" onclick="goScan()">同じ患者を続けて撮影</button>
-      <button class="btn-s"       onclick="goStart()">違う患者へ</button>
+      <button class="btn-s"       onclick="goStart()">次の患者へ</button>
       <div class="divider"></div>
       <button class="btn-d" onclick="goEnd()">作業を終了する</button>
     </div>
@@ -432,6 +446,7 @@ function goScan() {
   document.getElementById('scan-count').textContent   = gPhotoCount;
   document.getElementById('scan-err').style.display    = 'none';
   document.getElementById('scan-cancel').style.display = 'none';
+  document.getElementById('save-hint').style.display   = gFallbackMode ? 'block' : 'none';
   document.getElementById('file-input').value         = '';
   setCamIdle();
   show('scr-scan');
@@ -472,34 +487,32 @@ async function retrySave() {
 async function doSave() {
   gSaving = true;
   setCamBusy();
-
-  var result = gFallbackMode
-    ? await saveViaShare(gPendingFile)
-    : await saveToFS(gPendingFile);
-
-  gSaving = false;
-  setCamIdle();
+  var result = false;
+  try {
+    result = gFallbackMode
+      ? await saveViaShare(gPendingFile)
+      : await saveToFS(gPendingFile);
+  } catch(e) {
+    console.error('doSave unexpected error:', e);
+  } finally {
+    // ① エラー・例外がどこで起きても必ずカメラを復帰させる
+    gSaving = false;
+    setCamIdle();
+  }
 
   if (result === true) {
-    // 保存成功
     gPendingFile = null;
     gPhotoCount++;
-
     var ex = gHistory.find(function(h) { return h.id === gPatientId; });
     if (ex) { ex.count++; }
     else { gHistory.unshift({ id: gPatientId, name: gPatientName, count: 1 }); }
-
     document.getElementById('choice-name').textContent  = gPatientName;
     document.getElementById('choice-id').textContent    = '患者番号：' + pad5(gPatientId);
     document.getElementById('choice-count').textContent = gPhotoCount;
     show('scr-choice');
-
   } else if (result === 'cancel') {
-    // 共有シートをキャンセルした（ユーザー操作）
     document.getElementById('scan-cancel').style.display = 'block';
-
   } else {
-    // 保存エラー
     document.getElementById('scan-err').style.display = 'block';
   }
 }
