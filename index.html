@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="カルテスキャン">
 <meta name="theme-color" content="#007AFF">
 <title>カルテスキャン</title>
+<script>var APP_VERSION = 'v1.1';</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -165,6 +166,7 @@ input[type=file] { display: none; }
       <div class="big-emoji">📋</div>
       <div class="center-title">カルテスキャン</div>
       <div class="center-sub" id="init-sub">タップして準備をはじめます</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:8px" id="ver-label"></div>
       <div style="width:100%">
         <button class="btn-p" id="btn-init" onclick="onInitTap()">はじめる</button>
         <div class="err-box" id="init-err" style="display:none"></div>
@@ -281,6 +283,12 @@ input[type=file] { display: none; }
         <div class="patient-id"   id="choice-id"></div>
       </div>
       <div class="photo-count"><strong id="choice-count">0</strong> 枚目を保存</div>
+      <div class="info-bar" id="choice-folder-bar" style="display:none">
+        📁 <strong id="choice-folder-name"></strong> フォルダを作成済み
+      </div>
+      <button class="btn-p" style="background:#5856D6" onclick="createFolder()">
+        📁 フォルダを作成する
+      </button>
       <button class="btn-p green" onclick="goScan()">同じ患者を続けて撮影</button>
       <button class="btn-s"       onclick="goStart()">次の患者へ</button>
       <div class="divider"></div>
@@ -301,6 +309,11 @@ input[type=file] { display: none; }
           「ファイルに保存」→「このiPad内」<br>
           →「カルテスキャン」を選んで保存<br>
           <span style="font-size:12px;opacity:.8">✅ 2回目以降はiOSが同じフォルダを記憶します</span>
+        </div>
+        <div class="warn-box" style="text-align:left">
+          ⚠️ 共有シートが出たら<br>
+          <strong>「ファイルに保存」</strong>を選んでください<br>
+          <span style="font-size:12px">（「画像を保存」ではありません）</span>
         </div>
         <button class="btn-p teal" onclick="exportAll()">
           📤 未書き出しデータをまとめて書き出す
@@ -479,8 +492,25 @@ async function saveToFS(file) {
 }
 
 // ============================================================
-//  起動
+//  起動時初期化
 // ============================================================
+document.getElementById('ver-label').textContent = APP_VERSION;
+
+// ============================================================
+//  ショートカット連携：フォルダ作成
+// ============================================================
+function createFolder() {
+  var folderName = pad5(gPatientId) + '_' + gPatientName.replace(/\s+/g, '');
+  // ショートカットをURLスキームで呼び出し（引数にフォルダ名を渡す）
+  var url = 'shortcuts://run-shortcut?name=' + encodeURIComponent('カルテフォルダ作成')
+          + '&input=' + encodeURIComponent(folderName);
+  window.location.href = url;
+  // ショートカットから戻ったとき用に作成済み表示を更新
+  setTimeout(function() {
+    document.getElementById('choice-folder-name').textContent = folderName;
+    document.getElementById('choice-folder-bar').style.display = 'block';
+  }, 1500);
+}
 async function onInitTap() {
   var btn = document.getElementById('btn-init');
   btn.disabled = true;
