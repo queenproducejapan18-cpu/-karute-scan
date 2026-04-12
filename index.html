@@ -113,11 +113,6 @@ input[type=file] { display: none; }
   font-size: 14px; color: #C0392B; margin-bottom: 16px;
   line-height: 1.7; border: 0.5px solid rgba(255,59,48,.4);
 }
-.cancel-box {
-  background: #FFFBE6; border-radius: 10px; padding: 12px 14px;
-  font-size: 14px; color: #7A5000; margin-bottom: 16px;
-  line-height: 1.7; border: 0.5px solid #F0C040;
-}
 .success-bar {
   background: #F1FFF5; border-radius: 10px; padding: 11px 14px;
   font-size: 14px; color: #1A6B38; margin-bottom: 16px; line-height: 1.6;
@@ -184,6 +179,11 @@ input[type=file] { display: none; }
       <div class="top-bar-sub">最初の1回だけ必要です</div>
     </div>
     <div class="body">
+      <div class="info-bar" style="margin-bottom:20px">
+        📸 写真はこのアプリ内（iPad）に自動保存されます。<br>
+        作業終了後に「ファイルアプリに書き出す」でまとめて保存します。<br>
+        そのときに保存先フォルダが必要なので、今作成してください。
+      </div>
       <div class="step-box">
         <div class="step-title">📁 「カルテスキャン」フォルダの作成手順</div>
         <div class="step-item">① iPadの「ファイル」アプリを開く</div>
@@ -201,7 +201,7 @@ input[type=file] { display: none; }
         </div>
       </div>
       <button class="btn-p" id="btn-setup-done" disabled onclick="finishSetup()">
-        セットアップ完了・はじめる
+        完了・撮影をはじめる
       </button>
     </div>
   </div>
@@ -282,11 +282,7 @@ input[type=file] { display: none; }
       </div>
       <div class="photo-count"><strong id="choice-count">0</strong> 枚目を保存</div>
       <button class="btn-p green" onclick="goScan()">同じ患者を続けて撮影</button>
-      <button class="btn-s"       onclick="exportThenNext()">次の患者へ（書き出し）</button>
-      <div class="cancel-box" id="choice-cancel" style="display:none">
-        ⚠️ 書き出しがキャンセルされました。<br>
-        データはiPad内に保存済みです。終了画面からまとめて書き出せます。
-      </div>
+      <button class="btn-s"       onclick="goStart()">次の患者へ</button>
       <div class="divider"></div>
       <button class="btn-d" onclick="confirmEnd()">作業を終了する</button>
     </div>
@@ -324,9 +320,9 @@ input[type=file] { display: none; }
 // ============================================================
 //  状態
 // ============================================================
-var gPhotoDB     = null;   // IndexedDB（写真保存用）
-var gRootDir     = null;   // File System Access API（PC用）
-var gMode        = 'share'; // 'fs' | 'idb'
+var gPhotoDB     = null;
+var gRootDir     = null;
+var gMode        = 'share';
 var gPatientId   = '';
 var gPatientName = '';
 var gPhotoCount  = 0;
@@ -409,21 +405,6 @@ async function savePhotoToDB(file) {
   });
 }
 
-function getPhotosByPatient(patientId) {
-  return new Promise(function(res) {
-    var tx  = gPhotoDB.transaction('photos', 'readonly');
-    var idx = tx.objectStore('photos').index('patientId');
-    var req = idx.getAll(IDBKeyRange.only(patientId));
-    req.onsuccess = function(e) {
-      var records = e.target.result || [];
-      res(records.map(function(r) {
-        return { file: new File([r.data], r.filename, { type: r.type }), id: r.id };
-      }));
-    };
-    req.onerror = function() { res([]); };
-  });
-}
-
 function getUnexportedPhotos() {
   return new Promise(function(res) {
     var tx  = gPhotoDB.transaction('photos', 'readonly');
@@ -439,17 +420,12 @@ function getUnexportedPhotos() {
   });
 }
 
-function markExported(ids) {
+// 書き出し済みレコードをDBから完全削除（肥大化防止）
+function deleteExported(ids) {
   return new Promise(function(res) {
     var tx    = gPhotoDB.transaction('photos', 'readwrite');
     var store = tx.objectStore('photos');
-    ids.forEach(function(id) {
-      var req = store.get(id);
-      req.onsuccess = function(e) {
-        var record = e.target.result;
-        if (record) { record.exported = 1; store.put(record); }
-      };
-    });
+    ids.forEach(function(id) { store.delete(id); });
     tx.oncomplete = res;
   });
 }
@@ -511,13 +487,11 @@ async function onInitTap() {
   document.getElementById('init-err').style.display = 'none';
   document.getElementById('init-sub').textContent   = '準備中...';
 
-  // iPad / iOS Safari → IndexedDB モード
   if (!window.showDirectoryPicker) {
     try {
       gPhotoDB = await openPhotoDB();
       gMode    = 'idb';
       document.getElementById('start-folder-sub').textContent = '✅ 自動保存モード';
-      // 初回のみセットアップ画面
       if (localStorage.getItem('setupDone') !== '1') {
         show('scr-setup');
       } else {
@@ -532,7 +506,6 @@ async function onInitTap() {
     return;
   }
 
-  // PC / Chrome → File System Access API モード
   try {
     var db     = await openFSDB();
     var handle = await fsdbGet(db, 'rootDir');
@@ -580,15 +553,13 @@ function finishSetup() {
 // ============================================================
 //  患者入力
 // ============================================================
-// カタカナ判定（全角カタカナ・長音符・中点のみ許可）
 function isKatakana(str) {
   return /^[ァ-ヶーヴ\u30FB\s　]+$/.test(str);
 }
 
-var gComposing = false; // IME入力中フラグ
+var gComposing = false;
 
 function onInputChange() {
-  // 患者番号：数字以外を除去
   var idEl = document.getElementById('inp-id');
   idEl.value = idEl.value.replace(/[^0-9]/g, '');
   validateForm();
@@ -600,7 +571,6 @@ function onNameInput() {
 }
 
 function onNameCompose() {
-  // IME確定後にバリデーション
   gComposing = false;
   validateName();
   validateForm();
@@ -615,7 +585,6 @@ function validateName() {
     hintEl.style.color = 'var(--text3)';
     return;
   }
-  // スペース除いて判定
   var noSpace = val.replace(/[\s　]/g, '');
   if (noSpace.length > 0 && !isKatakana(val)) {
     hintEl.textContent = '⚠️ カタカナ以外の文字が含まれています';
@@ -683,7 +652,7 @@ function setCamBusy() {
 }
 
 // ============================================================
-//  写真取り込み → 自動保存（ユーザー操作不要）
+//  写真取り込み → 自動保存
 // ============================================================
 async function onPhoto(e) {
   var files = Array.from(e.target.files);
@@ -722,10 +691,9 @@ async function doSave() {
     var ex = gHistory.find(function(h) { return h.id === gPatientId; });
     if (ex) { ex.count++; }
     else { gHistory.unshift({ id: gPatientId, name: gPatientName, count: 1 }); }
-    document.getElementById('choice-name').textContent    = gPatientName;
-    document.getElementById('choice-id').textContent      = '患者番号：' + pad5(gPatientId);
-    document.getElementById('choice-count').textContent   = gPhotoCount;
-    document.getElementById('choice-cancel').style.display = 'none';
+    document.getElementById('choice-name').textContent  = gPatientName;
+    document.getElementById('choice-id').textContent    = '患者番号：' + pad5(gPatientId);
+    document.getElementById('choice-count').textContent = gPhotoCount;
     show('scr-choice');
   } else {
     document.getElementById('scan-err').style.display = 'block';
@@ -733,30 +701,8 @@ async function doSave() {
 }
 
 // ============================================================
-//  書き出し（ユーザージェスチャーから呼ぶ）
+//  書き出し → 完了後にDBから削除
 // ============================================================
-async function exportThenNext() {
-  if (gMode !== 'idb') { goStart(); return; }
-  var items = await getPhotosByPatient(gPatientId);
-  if (!items.length) { goStart(); return; }
-  var files = items.map(function(i) { return i.file; });
-  var ids   = items.map(function(i) { return i.id; });
-  try {
-    if (navigator.canShare && navigator.canShare({ files: files })) {
-      await navigator.share({ files: files, title: getPrefix(gPatientId, gPatientName) });
-      await markExported(ids);
-      localStorage.setItem('exportDone', '1');
-    }
-  } catch(e) {
-    if (e.name === 'AbortError') {
-      document.getElementById('choice-cancel').style.display = 'block';
-    } else {
-      console.error('exportThenNext error:', e);
-    }
-  }
-  goStart();
-}
-
 async function exportAll() {
   if (gMode !== 'idb') return;
   var items = await getUnexportedPhotos();
@@ -766,9 +712,11 @@ async function exportAll() {
   try {
     if (navigator.canShare && navigator.canShare({ files: files })) {
       await navigator.share({ files: files, title: '今日のカルテスキャン' });
-      await markExported(ids);
+      // 書き出し完了 → DBから削除してクリーンに保つ
+      await deleteExported(ids);
       localStorage.setItem('exportDone', '1');
       document.getElementById('end-first-guide').style.display = 'none';
+      document.getElementById('end-export-area').style.display = 'none';
       alert('書き出しが完了しました');
     }
   } catch(e) {
