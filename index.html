@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="カルテスキャン">
 <meta name="theme-color" content="#007AFF">
 <title>カルテスキャン</title>
-<script>var APP_VERSION = 'v1.2';</script>
+<script>var APP_VERSION = 'v1.4';</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -296,6 +296,12 @@ input[type=file] { display: none; }
       <button class="btn-p teal" id="btn-export-patient" onclick="exportPatient()">
         📁 フォルダ作成 → 書き出す
       </button>
+      <div class="info-bar" style="text-align:left;font-size:13px;margin-top:-4px">
+        ① 共有シートが出たら<br>
+        　「<strong>ファイルに保存</strong>」を選ぶ<br>
+        ② 「このiPad内」→「<strong>カルテスキャン</strong>」に保存<br>
+        ③ 保存後にフォルダ作成・ファイル移動が自動で動きます
+      </div>
       <div class="success-bar" id="choice-done-bar" style="display:none">
         ✅ 書き出し完了！次の患者へ進めます
       </div>
@@ -760,39 +766,35 @@ async function exportPatient() {
   btn.textContent = '⏳ 処理中...';
 
   // ============================================================
-  // STEP1：ショートカット①「カルテフォルダ作成」を呼び出す
+  // STEP1：共有シートで写真をカルテスキャン直下に書き出す
+  // 役割：IndexedDB内の写真をファイルアプリのカルテスキャン直下に保存
+  // 「ファイルに保存」→「このiPad内」→「カルテスキャン」を選んでもらう
+  // ============================================================
+  await doExportPatient(items, folderName);
+
+  // ============================================================
+  // STEP2：ショートカット①「カルテフォルダ作成」を呼び出す
   // 役割：カルテスキャン配下に患者フォルダを作成する
-  // 失敗時：ショートカット①の通知でエラーが分かる
+  // 書き出し完了後に実行するため待機する
   // ============================================================
-  var step1url = 'shortcuts://run-shortcut?name='
-               + encodeURIComponent('カルテフォルダ作成')
-               + '&input=' + encodeURIComponent(folderName);
-
-  // STEP1を起動（ショートカットアプリがフォルダ作成を実行）
-  window.location.href = step1url;
-
-  // ============================================================
-  // STEP2：共有シートで写真をファイルアプリに書き出す
-  // 役割：IndexedDB内の写真をカルテスキャンフォルダに書き出す
-  // STEP1完了後に共有シートを出すため少し待機する
-  // 「ファイルに保存」→作成済みフォルダを選んで保存してもらう
-  // ============================================================
-  setTimeout(async function() {
-    await doExportPatient(items, folderName);
-  }, 1500);
+  setTimeout(function() {
+    var step2url = 'shortcuts://run-shortcut?name='
+                 + encodeURIComponent('カルテフォルダ作成')
+                 + '&input=' + encodeURIComponent(folderName);
+    window.location.href = step2url;
+  }, 1000);
 
   // ============================================================
   // STEP3：ショートカット②「カルテファイル移動」を呼び出す
-  // 役割：カルテスキャン直下に残った写真を患者フォルダに移動する
-  // 失敗時：ショートカット②の通知でエラーが分かる
-  // STEP2（共有シート）完了後に実行するため十分な待機時間を設ける
+  // 役割：カルテスキャン直下の写真を患者フォルダに移動する
+  // STEP2完了後に実行するため十分な待機時間を設ける
   // ============================================================
   setTimeout(function() {
     var step3url = 'shortcuts://run-shortcut?name='
                  + encodeURIComponent('カルテファイル移動')
                  + '&input=' + encodeURIComponent(folderName);
     window.location.href = step3url;
-  }, 8000);
+  }, 4000);
 }
 
 // 共有シートで写真を書き出し、完了後にDBから削除する
