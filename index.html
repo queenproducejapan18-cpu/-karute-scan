@@ -736,84 +736,106 @@ async function doSave() {
 }
 
 // ============================================================
-//  患者ごと書き出し：フォルダ作成→共有シート
+//  患者ごと書き出し：①フォルダ作成SC → ②ファイル移動SC → 共有シート
+//  モジュール分割設計：フォルダ作成とファイル移動を別ショートカットにする
+//  どこで失敗したかを明確に切り分けられるようにする
 // ============================================================
-var gExportPending = false; // visibilitychange待ち中フラグ
 
 async function exportPatient() {
   if (gMode !== 'idb') return;
 
-  // この患者の未書き出し写真を取得
+  // 未書き出し写真の存在確認
   var items = await getPhotosByPatientUnexported(gPatientId);
   if (!items.length) {
     alert('書き出す写真がありません');
     return;
   }
 
+  // フォルダ名を生成（患者番号5桁_患者名スペース除去）
   var folderName = pad5(gPatientId) + '_' + gPatientName.replace(/\s+/g, '');
 
-  // ① ショートカットでフォルダ作成
-  var url = 'shortcuts://run-shortcut?name='
-          + encodeURIComponent('カルテフォルダ作成')
-          + '&input=' + encodeURIComponent(folderName);
+  // ボタンを無効化してユーザーの二重タップを防ぐ
+  var btn = document.getElementById('btn-export-patient');
+  btn.disabled = true;
+  btn.textContent = '⏳ 処理中...';
 
-  // ② ショートカットから戻ったら共有シートを自動で出す
-  gExportPending = true;
-  document.getElementById('btn-export-patient').disabled = true;
-  document.getElementById('btn-export-patient').textContent = '⏳ ショートカット実行中...';
+  // ============================================================
+  // STEP1：ショートカット①「カルテフォルダ作成」を呼び出す
+  // 役割：カルテスキャン配下に患者フォルダを作成する
+  // 失敗時：ショートカット①の通知でエラーが分かる
+  // ============================================================
+  var step1url = 'shortcuts://run-shortcut?name='
+               + encodeURIComponent('カルテフォルダ作成')
+               + '&input=' + encodeURIComponent(folderName);
 
-  window.location.href = url;
+  // STEP1を起動（ショートカットアプリがフォルダ作成を実行）
+  window.location.href = step1url;
+
+  // ============================================================
+  // STEP2：ショートカット②「カルテファイル移動」を呼び出す
+  // 役割：カルテスキャン直下の該当患者ファイルをフォルダに移動する
+  // 失敗時：ショートカット②の通知でエラーが分かる
+  // STEP1完了後にSTEP2を呼び出すため少し待機する
+  // ============================================================
+  setTimeout(function() {
+    var step2url = 'shortcuts://run-shortcut?name='
+                 + encodeURIComponent('カルテファイル移動')
+                 + '&input=' + encodeURIComponent(folderName);
+    window.location.href = step2url;
+  }, 1500);
+
+  // ============================================================
+  // STEP3：共有シートで写真をファイルアプリに書き出す
+  // 役割：IndexedDB内の写真をファイルアプリに渡す
+  // STEP2完了後に共有シートを出すため少し待機する
+  // ============================================================
+  setTimeout(async function() {
+    await doExportPatient(items, folderName);
+  }, 3500);
 }
 
-// ショートカットから戻ったとき（visibilitychange）に共有シートを起動
-document.addEventListener('visibilitychange', async function() {
-  if (document.visibilityState !== 'visible') return;
-  if (!gExportPending) return;
-  gExportPending = false;
-
-  // 少し待ってから共有シートを出す（iOSの遷移が落ち着くのを待つ）
-  setTimeout(async function() {
-    await doExportPatient();
-  }, 600);
-});
-
-async function doExportPatient() {
-  var items = await getPhotosByPatientUnexported(gPatientId);
-  if (!items.length) return;
-
+// 共有シートで写真を書き出し、完了後にDBから削除する
+async function doExportPatient(items, folderName) {
   var files = items.map(function(i) { return i.file; });
   var ids   = items.map(function(i) { return i.id; });
+  var btn   = document.getElementById('btn-export-patient');
 
   try {
     if (navigator.canShare && navigator.canShare({ files: files })) {
-      await navigator.share({ files: files, title: pad5(gPatientId) + '_' + gPatientName.replace(/\s+/g,'') });
-      // 書き出し完了 → DBから削除
+      // 共有シートを起動（「ファイルに保存」を選んでもらう）
+      await navigator.share({ files: files, title: folderName });
+
+      // 書き出し完了 → IndexedDBから該当レコードを削除してDBをクリーンに保つ
       await deleteExported(ids);
-      // UI更新
-      document.getElementById('btn-export-patient').style.display = 'none';
+
+      // UIを書き出し完了状態に更新
+      btn.style.display = 'none';
       document.getElementById('choice-export-guide').style.display = 'none';
       document.getElementById('choice-done-bar').style.display = 'block';
       document.getElementById('btn-next-patient').style.display = 'block';
-      // 履歴に書き出し済みマーク
+
+      // 履歴に書き出し済みマークを付ける
       var ex = gHistory.find(function(h) { return h.id === gPatientId; });
       if (ex) ex.exported = true;
     }
   } catch(e) {
-    document.getElementById('btn-export-patient').disabled = false;
-    document.getElementById('btn-export-patient').textContent = '📁 フォルダ作成 → 書き出す';
+    // キャンセル以外のエラーはユーザーに通知してリトライを促す
+    btn.disabled = false;
+    btn.textContent = '📁 フォルダ作成 → 書き出す';
     if (e.name !== 'AbortError') {
       alert('書き出しに失敗しました。もう一度タップしてください。');
     }
   }
 }
 
-// この患者の未書き出し写真を取得
+// この患者の未書き出し写真をIndexedDBから取得する
 function getPhotosByPatientUnexported(patientId) {
   return new Promise(function(res) {
     var tx  = gPhotoDB.transaction('photos', 'readonly');
     var idx = tx.objectStore('photos').index('patientId');
     var req = idx.getAll(IDBKeyRange.only(patientId));
     req.onsuccess = function(e) {
+      // exported=0（未書き出し）のレコードのみを対象にする
       var records = (e.target.result || []).filter(function(r) { return r.exported === 0; });
       res(records.map(function(r) {
         return { file: new File([r.data], r.filename, { type: r.type }), id: r.id };
