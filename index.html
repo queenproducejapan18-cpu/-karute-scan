@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="カルテスキャン">
 <meta name="theme-color" content="#007AFF">
 <title>カルテスキャン</title>
-<script>var APP_VERSION = 'v1.1';</script>
+<script>var APP_VERSION = 'v1.2';</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -772,26 +772,27 @@ async function exportPatient() {
   window.location.href = step1url;
 
   // ============================================================
-  // STEP2：ショートカット②「カルテファイル移動」を呼び出す
-  // 役割：カルテスキャン直下の該当患者ファイルをフォルダに移動する
-  // 失敗時：ショートカット②の通知でエラーが分かる
-  // STEP1完了後にSTEP2を呼び出すため少し待機する
-  // ============================================================
-  setTimeout(function() {
-    var step2url = 'shortcuts://run-shortcut?name='
-                 + encodeURIComponent('カルテファイル移動')
-                 + '&input=' + encodeURIComponent(folderName);
-    window.location.href = step2url;
-  }, 1500);
-
-  // ============================================================
-  // STEP3：共有シートで写真をファイルアプリに書き出す
-  // 役割：IndexedDB内の写真をファイルアプリに渡す
-  // STEP2完了後に共有シートを出すため少し待機する
+  // STEP2：共有シートで写真をファイルアプリに書き出す
+  // 役割：IndexedDB内の写真をカルテスキャンフォルダに書き出す
+  // STEP1完了後に共有シートを出すため少し待機する
+  // 「ファイルに保存」→作成済みフォルダを選んで保存してもらう
   // ============================================================
   setTimeout(async function() {
     await doExportPatient(items, folderName);
-  }, 3500);
+  }, 1500);
+
+  // ============================================================
+  // STEP3：ショートカット②「カルテファイル移動」を呼び出す
+  // 役割：カルテスキャン直下に残った写真を患者フォルダに移動する
+  // 失敗時：ショートカット②の通知でエラーが分かる
+  // STEP2（共有シート）完了後に実行するため十分な待機時間を設ける
+  // ============================================================
+  setTimeout(function() {
+    var step3url = 'shortcuts://run-shortcut?name='
+                 + encodeURIComponent('カルテファイル移動')
+                 + '&input=' + encodeURIComponent(folderName);
+    window.location.href = step3url;
+  }, 8000);
 }
 
 // 共有シートで写真を書き出し、完了後にDBから削除する
