@@ -8,7 +8,7 @@
 <meta name="apple-mobile-web-app-title" content="カルテスキャン">
 <meta name="theme-color" content="#007AFF">
 <title>カルテスキャン</title>
-<script>var APP_VERSION = 'v1.5';</script>
+<script>var APP_VERSION = 'v1.6';</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -515,21 +515,7 @@ async function saveToFS(file) {
 // ============================================================
 document.getElementById('ver-label').textContent = APP_VERSION;
 
-// ============================================================
-//  ショートカット連携：フォルダ作成
-// ============================================================
-function createFolder() {
-  var folderName = pad5(gPatientId) + '_' + gPatientName.replace(/\s+/g, '');
-  // ショートカットをURLスキームで呼び出し（引数にフォルダ名を渡す）
-  var url = 'shortcuts://run-shortcut?name=' + encodeURIComponent('カルテフォルダ作成')
-          + '&input=' + encodeURIComponent(folderName);
-  window.location.href = url;
-  // ショートカットから戻ったとき用に作成済み表示を更新
-  setTimeout(function() {
-    document.getElementById('choice-folder-name').textContent = folderName;
-    document.getElementById('choice-folder-bar').style.display = 'block';
-  }, 1500);
-}
+
 async function onInitTap() {
   var btn = document.getElementById('btn-init');
   btn.disabled = true;
@@ -858,13 +844,6 @@ function completePatient() {
   gShortcutDone = false;
   gFolderName   = '';
   goStart();
-}
-    btn.disabled = false;
-    btn.textContent = '📁 フォルダ作成 → 書き出す';
-    if (e.name !== 'AbortError') {
-      alert('書き出しに失敗しました。もう一度タップしてください。');
-    }
-  }
 }
 
 // この患者の未書き出し写真をIndexedDBから取得する
