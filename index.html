@@ -8,7 +8,6 @@
 <meta name="apple-mobile-web-app-title" content="カルテスキャン">
 <meta name="theme-color" content="#007AFF">
 <title>カルテスキャン</title>
-<script>var APP_VERSION = 'v1.6';</script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 :root {
@@ -166,7 +165,6 @@ input[type=file] { display: none; }
       <div class="big-emoji">📋</div>
       <div class="center-title">カルテスキャン</div>
       <div class="center-sub" id="init-sub">タップして準備をはじめます</div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px" id="ver-label"></div>
       <div style="width:100%">
         <button class="btn-p" id="btn-init" onclick="onInitTap()">はじめる</button>
         <div class="err-box" id="init-err" style="display:none"></div>
@@ -282,47 +280,9 @@ input[type=file] { display: none; }
         <div class="patient-name" id="choice-name"></div>
         <div class="patient-id"   id="choice-id"></div>
       </div>
-      <div class="photo-count"><strong id="choice-count">0</strong> 枚撮影済み</div>
-      <button class="btn-p green" onclick="goScan()">続けて撮影する</button>
-      <div class="divider"></div>
-      <div class="info-bar" style="text-align:left;margin-bottom:8px">
-        📋 この患者の撮影が終わったら下のボタンで書き出してください
-      </div>
-      <div class="warn-box" id="choice-export-guide" style="text-align:left;margin-bottom:8px">
-        ⚠️ 共有シートが出たら<br>
-        <strong>「ファイルに保存」</strong>を選んでください<br>
-        <span style="font-size:12px">（「画像を保存」ではありません）</span>
-      </div>
-      <!-- STEP1：書き出しボタン -->
-      <button class="btn-p teal" id="btn-export-patient" onclick="exportPatient()">
-        📤 書き出す
-      </button>
-      <div class="info-bar" style="text-align:left;font-size:13px;margin-top:-4px">
-        共有シートが出たら<br>
-        「<strong>ファイルに保存</strong>」→「このiPad内」→「<strong>カルテスキャン</strong>」に保存
-      </div>
-
-      <!-- STEP2：ショートカット実行ボタン（書き出し完了後に表示） -->
-      <div id="shortcut-area" style="display:none">
-        <div class="warn-box" style="text-align:left">
-          ⚠️ 次に「カルテ整理」ショートカットを実行してください<br>
-          <span style="font-size:12px">実行しないとファイルが整理されません</span>
-        </div>
-        <button class="btn-p" style="background:#5856D6" onclick="runShortcut()">
-          ▶️ カルテ整理ショートカットを実行する
-        </button>
-      </div>
-
-      <!-- STEP3：完了ボタン（ショートカット実行後に表示） -->
-      <div id="complete-area" style="display:none">
-        <div class="success-bar">
-          ✅ ショートカットを実行しました
-        </div>
-        <button class="btn-p green" id="btn-next-patient" onclick="completePatient()">
-          この患者の処理を完了して次へ
-        </button>
-      </div>
-
+      <div class="photo-count"><strong id="choice-count">0</strong> 枚目を保存</div>
+      <button class="btn-p green" onclick="goScan()">同じ患者を続けて撮影</button>
+      <button class="btn-s"       onclick="goStart()">次の患者へ</button>
       <div class="divider"></div>
       <button class="btn-d" onclick="confirmEnd()">作業を終了する</button>
     </div>
@@ -335,10 +295,18 @@ input[type=file] { display: none; }
       <div class="center-title">お疲れさまでした</div>
       <div class="center-sub" id="end-sub" style="margin-bottom:16px"></div>
       <div class="info-box" id="end-info"></div>
-      <div class="warn-box" id="end-warn-unexported" style="display:none;width:100%;text-align:left;margin-top:12px">
-        ⚠️ 書き出し未完了の患者がいます。<br>「作業を再開する」から書き出してください。
+      <div id="end-export-area" style="display:none;width:100%;margin-bottom:12px">
+        <div class="export-guide" id="end-first-guide" style="display:none">
+          📁 <strong>初回のみ</strong>：共有シートで<br>
+          「ファイルに保存」→「このiPad内」<br>
+          →「カルテスキャン」を選んで保存<br>
+          <span style="font-size:12px;opacity:.8">✅ 2回目以降はiOSが同じフォルダを記憶します</span>
+        </div>
+        <button class="btn-p teal" onclick="exportAll()">
+          📤 未書き出しデータをまとめて書き出す
+        </button>
       </div>
-      <div style="width:100%;margin-top:16px">
+      <div style="width:100%">
         <button class="btn-p" onclick="goStart()">作業を再開する</button>
       </div>
     </div>
@@ -511,11 +479,8 @@ async function saveToFS(file) {
 }
 
 // ============================================================
-//  起動時初期化
+//  起動
 // ============================================================
-document.getElementById('ver-label').textContent = APP_VERSION;
-
-
 async function onInitTap() {
   var btn = document.getElementById('btn-init');
   btn.disabled = true;
@@ -729,16 +694,6 @@ async function doSave() {
     document.getElementById('choice-name').textContent  = gPatientName;
     document.getElementById('choice-id').textContent    = '患者番号：' + pad5(gPatientId);
     document.getElementById('choice-count').textContent = gPhotoCount;
-    // 書き出しUI初期化（各エリアをリセットする）
-    document.getElementById('btn-export-patient').style.display = 'block';
-    document.getElementById('btn-export-patient').disabled      = false;
-    document.getElementById('btn-export-patient').textContent   = '📤 書き出す';
-    document.getElementById('shortcut-area').style.display      = 'none';
-    document.getElementById('complete-area').style.display      = 'none';
-    // 処理状態フラグをリセット
-    gExported     = false;
-    gShortcutDone = false;
-    gFolderName   = '';
     show('scr-choice');
   } else {
     document.getElementById('scan-err').style.display = 'block';
@@ -746,138 +701,36 @@ async function doSave() {
 }
 
 // ============================================================
-//  患者ごと処理：書き出し → ショートカット実行 → 完了の3ステップ
-//  各ステップを完了しないと次に進めない設計（未完了ガード）
+//  書き出し → 完了後にDBから削除
 // ============================================================
-
-// 現在の患者の処理状態を管理するフラグ
-var gExported      = false; // 書き出し完了フラグ
-var gShortcutDone  = false; // ショートカット実行完了フラグ
-var gFolderName    = '';    // 現在の患者のフォルダ名
-
-async function exportPatient() {
+async function exportAll() {
   if (gMode !== 'idb') return;
-
-  // 未書き出し写真の存在確認
-  var items = await getPhotosByPatientUnexported(gPatientId);
-  if (!items.length) {
-    alert('書き出す写真がありません');
-    return;
-  }
-
-  // フォルダ名を生成（患者番号5桁_患者名スペース除去）
-  gFolderName = pad5(gPatientId) + '_' + gPatientName.replace(/\s+/g, '');
-
-  // 書き出しボタンを無効化して二重タップを防ぐ
-  var btn = document.getElementById('btn-export-patient');
-  btn.disabled = true;
-  btn.textContent = '⏳ 処理中...';
-
-  // 共有シートで書き出し（「ファイルに保存」→カルテスキャン直下に保存してもらう）
-  await doExportPatient(items, gFolderName);
-}
-
-// 共有シートで写真を書き出し、完了後にショートカット実行ボタンを表示する
-async function doExportPatient(items, folderName) {
+  var items = await getUnexportedPhotos();
+  if (!items.length) { alert('未書き出しのデータはありません'); return; }
   var files = items.map(function(i) { return i.file; });
   var ids   = items.map(function(i) { return i.id; });
-  var btn   = document.getElementById('btn-export-patient');
-
   try {
     if (navigator.canShare && navigator.canShare({ files: files })) {
-      // 共有シートを起動（「ファイルに保存」を選んでもらう）
-      await navigator.share({ files: files, title: folderName });
-
-      // 書き出し完了 → IndexedDBから削除してDBをクリーンに保つ
+      await navigator.share({ files: files, title: '今日のカルテスキャン' });
+      // 書き出し完了 → DBから削除してクリーンに保つ
       await deleteExported(ids);
-
-      // 書き出し完了フラグを立てる
-      gExported = true;
-
-      // 書き出しボタンを隠してショートカット実行ボタンを表示する
-      btn.style.display = 'none';
-      document.getElementById('shortcut-area').style.display = 'block';
-
-      // 履歴に書き出し済みマークを付ける
-      var ex = gHistory.find(function(h) { return h.id === gPatientId; });
-      if (ex) ex.exported = true;
+      localStorage.setItem('exportDone', '1');
+      document.getElementById('end-first-guide').style.display = 'none';
+      document.getElementById('end-export-area').style.display = 'none';
+      alert('書き出しが完了しました');
     }
   } catch(e) {
-    // キャンセル以外のエラーはリトライを促す
-    btn.disabled = false;
-    btn.textContent = '📤 書き出す';
     if (e.name !== 'AbortError') {
       alert('書き出しに失敗しました。もう一度タップしてください。');
     }
   }
 }
 
-// ショートカット「カルテ整理」を起動する
-function runShortcut() {
-  var url = 'shortcuts://run-shortcut?name='
-          + encodeURIComponent('カルテ整理')
-          + '&input=' + encodeURIComponent(gFolderName);
-
-  // ショートカット実行完了エリアを表示してから起動する
-  // （戻ってきたときに完了ボタンが見えるようにする）
-  document.getElementById('shortcut-area').style.display = 'none';
-  document.getElementById('complete-area').style.display = 'block';
-  gShortcutDone = true;
-
-  window.location.href = url;
-}
-
-// ショートカット実行後に患者の処理を完了して次の患者へ進む
-function completePatient() {
-  // 書き出しとショートカットが両方完了しているか確認
-  if (!gExported) {
-    alert('先に書き出しを完了してください');
-    return;
-  }
-  if (!gShortcutDone) {
-    alert('先にカルテ整理ショートカットを実行してください');
-    return;
-  }
-
-  // フラグをリセットして次の患者へ
-  gExported     = false;
-  gShortcutDone = false;
-  gFolderName   = '';
-  goStart();
-}
-
-// この患者の未書き出し写真をIndexedDBから取得する
-function getPhotosByPatientUnexported(patientId) {
-  return new Promise(function(res) {
-    var tx  = gPhotoDB.transaction('photos', 'readonly');
-    var idx = tx.objectStore('photos').index('patientId');
-    var req = idx.getAll(IDBKeyRange.only(patientId));
-    req.onsuccess = function(e) {
-      // exported=0（未書き出し）のレコードのみを対象にする
-      var records = (e.target.result || []).filter(function(r) { return r.exported === 0; });
-      res(records.map(function(r) {
-        return { file: new File([r.data], r.filename, { type: r.type }), id: r.id };
-      }));
-    };
-    req.onerror = function() { res([]); };
-  });
-}
-
 // ============================================================
 //  終了
 // ============================================================
 function confirmEnd() {
-  // 書き出し済みだがショートカット未実行の場合は終了させない
-  if (gExported && !gShortcutDone) {
-    alert('⚠️ カルテ整理ショートカットがまだ実行されていません。\n「▶️ カルテ整理ショートカットを実行する」を押してから終了してください。');
-    return;
-  }
-  // 書き出し未完了の場合も終了させない
-  if (!gExported && gPhotoCount > 0 && gPatientId !== '') {
-    alert('⚠️ この患者の書き出しが完了していません。\n「📤 書き出す」を押してから終了してください。');
-    return;
-  }
-  if (!confirm('作業を終了しますか？\n\nOK → 終了する\nキャンセル → 戻る')) return;
+  if (!confirm('このカルテのスキャンは全部完了しましたか？\n\nOK → 作業を終了する\nキャンセル → 戻る')) return;
   goEnd();
 }
 
@@ -890,17 +743,18 @@ function goEnd() {
       : '本日の撮影はありませんでした。';
   document.getElementById('end-info').innerHTML = gHistory.length > 0
     ? gHistory.map(function(h) {
-        var exportedMark = h.exported ? ' ✅' : ' ⚠️未書出';
-        return '<div class="info-row"><strong>' + pad5(h.id) + '　' + h.name + '</strong>'
-             + '<span>' + h.count + '枚' + exportedMark + '</span></div>';
+        return '<div class="info-row"><strong>' + pad5(h.id) + '　' + h.name + '</strong><span>' + h.count + '枚</span></div>';
       }).join('')
     : '<div class="info-row" style="color:var(--text3)">記録なし</div>';
 
-  // 未書き出しがいれば警告表示
-  var hasUnexported = gHistory.some(function(h) { return !h.exported; });
-  document.getElementById('end-warn-unexported').style.display =
-    (gHistory.length > 0 && hasUnexported) ? 'block' : 'none';
-
+  var exportArea = document.getElementById('end-export-area');
+  if (gMode === 'idb' && gHistory.length > 0) {
+    exportArea.style.display = 'block';
+    var firstExport = localStorage.getItem('exportDone') !== '1';
+    document.getElementById('end-first-guide').style.display = firstExport ? 'block' : 'none';
+  } else {
+    exportArea.style.display = 'none';
+  }
   show('scr-end');
 }
 
